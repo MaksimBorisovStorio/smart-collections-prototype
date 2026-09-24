@@ -1,0 +1,54 @@
+.screen {
+  position: absolute;
+  inset: 0;
+  background: var(--color-bg);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  will-change: transform;
+  transition: transform 300ms ease;
+}
+
+.screen--enter-right {
+  transform: translateX(100%);
+}
+
+.screen--exit-right {
+  transform: translateX(100%);
+}
+
+.screen--active {
+  transform: translateX(0);
+}
+
+/* Bottom sheet */
+.sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-bg);
+  border-radius: 20px 20px 0 0;
+  transform: translateY(100%);
+  transition: transform 350ms ease;
+  will-change: transform;
+  z-index: 10;
+}
+
+.sheet--active {
+  transform: translateY(0);
+}
+
+.sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  opacity: 0;
+  transition: opacity 350ms ease;
+  pointer-events: none;
+}
+
+.sheet-backdrop--active {
+  opacity: 1;
+  pointer-events: auto;
+}
