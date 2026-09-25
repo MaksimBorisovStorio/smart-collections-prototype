@@ -5,6 +5,8 @@ Router.register('home', {
     return `
       <div class="home">
 
+        <div class="home__scroll">
+
         <!-- Header with logo -->
         <header class="home__header">
           <img class="home__logo" src="assets/logo.svg" alt="Photobox">
@@ -30,6 +32,9 @@ Router.register('home', {
             </div>
             <div class="sc-banner__carousel">
               <div class="carousel__track" id="carousel-track">
+                <!-- Leading duplicate: keeps the banner's left edge covered at every
+                     phase of the loop, so nothing ever flickers to bare purple -->
+                <img src="assets/photos/photo-6.png" alt="">
                 <img src="assets/photos/photo-1.png" alt="">
                 <img src="assets/photos/photo-2.png" alt="">
                 <img src="assets/photos/photo-3.png" alt="">
@@ -76,6 +81,8 @@ Router.register('home', {
             </div>
           </div>
         </div>
+
+        </div><!-- /home__scroll -->
 
         <!-- Tab bar -->
         <nav class="tab-bar">

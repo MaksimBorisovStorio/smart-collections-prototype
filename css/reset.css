@@ -2,7 +2,7 @@
 
 :root {
   /* Exact values from Figma */
-  --color-primary: #008e93;
+  --color-primary: #007377;
   --color-primary-nav: #007377;
   --color-purple: #886bb3;
   --color-purple-arrow-bg: #a893c8;
@@ -13,6 +13,17 @@
   --color-text-secondary: #777777;
   --color-discount: #f25f70;
   --color-border: #cccccc;
+  /* Smart Collections — exact Figma design-system tokens */
+  --color-fg-black: #333333;        /* colour/foreground/fg-black */
+  --color-fg-secondary: #007377;    /* colour/foreground/fg-secondary */
+  --color-fg-white: #ffffff;        /* colour/foreground/fg-white */
+  --color-alpha-white-75: rgba(255,255,255,0.75); /* functional/alpha/alpha-white-75 */
+  --color-grey-25: #fafafa;         /* functional-colours/grey/25 */
+  --color-grey-50: #f4f4f4;         /* functional-colours/grey/50 */
+  --color-bg-secondary: #eeeeee;    /* colour/background/bg-secondary */
+  --color-secondary-100: #d9e9ea;   /* extended-brand/secondary/100 */
+  --color-secondary-400: #008e93;   /* extended-brand/secondary/400 */
+  --color-large-title: #292929;     /* iOS LargeTitle colour */
   --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif;
   --tab-bar-height: 80px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -40,30 +51,41 @@ img { max-width: 100%; display: block; }
 button { font-family: var(--font); cursor: pointer; border: none; background: none; }
 
 /* ── Home ── */
-.home { display: flex; flex-direction: column; min-height: 100%; padding-bottom: calc(80px + 30px + var(--safe-bottom)); overflow-y: auto; background: var(--color-bg); }
+/* Fixed-position elements can't escape .screen's transform, so the tab bar is a
+   flex sibling of the scroll region instead of position: fixed. */
+.home { display: flex; flex-direction: column; height: 100%; overflow: hidden; background: var(--color-bg); }
+.home__scroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; }
 
 .home__header { display: flex; justify-content: center; align-items: center; height: 44px; padding: 0 16px; flex-shrink: 0; background: var(--color-bg); }
 .home__logo { height: 32px; width: auto; display: block; }
 
-.home__promo-banner { margin: 0; background: var(--color-primary); padding: 16px; color: #fff; flex-shrink: 0; }
+.home__promo-banner { margin: 0; background: #008e93; padding: 16px; color: #fff; flex-shrink: 0; }
 .promo__title { font-size: 20px; font-weight: 600; line-height: 24px; letter-spacing: 0.38px; margin-bottom: 4px; }
 .promo__code { font-size: 12px; font-weight: 400; line-height: 16px; color: #fff; }
 .promo__code strong { font-weight: 700; }
 
-.home__sc-banner { display: flex; flex-direction: column; margin: 0 16px; background: var(--color-purple); border-radius: 16px; padding: 16px; color: #fff; text-align: left; width: calc(100% - 32px); overflow: hidden; -webkit-tap-highlight-color: rgba(0,0,0,0.1); flex-shrink: 0; gap: 16px; }
+.home__sc-banner { display: flex; flex-direction: column; background: var(--color-purple); border-radius: 16px; padding: 16px; color: #fff; text-align: left; width: 100%; overflow: hidden; -webkit-tap-highlight-color: rgba(0,0,0,0.1); flex-shrink: 0; gap: 16px; }
 .sc-banner__top { display: flex; justify-content: space-between; align-items: flex-start; }
 .sc-banner__text { flex: 1; display: flex; flex-direction: column; gap: 4px; }
 .sc-banner__title { font-size: 20px; font-weight: 800; line-height: 24px; letter-spacing: 0.38px; display: block; }
 .sc-banner__sub { font-size: 15px; font-weight: 400; line-height: 20px; letter-spacing: -0.24px; color: #fbfbfd; display: block; }
 .sc-banner__arrow { background: var(--color-purple-arrow-bg); border: 1px solid var(--color-purple-arrow-border); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 8px; }
 .sc-banner__arrow img { width: 24px; height: 24px; }
-.sc-banner__carousel { width: 100%; overflow: hidden; height: 107px; }
-.carousel__track { display: flex; gap: 8px; height: 107px; animation: carousel-scroll 10s linear infinite; }
+/* Full bleed: the strip spans the banner edge to edge and is cut by its rounded
+   corners on all three sides. 68px of the 107px tiles stay visible.
+   padding-left keeps the first tile aligned with the text at rest, while tiles
+   scrolling out are clipped at the banner's left edge (overflow clips at the
+   padding box, not the content box). */
+.sc-banner__carousel { width: calc(100% + 32px); margin: 0 -16px -16px; padding-left: 16px; overflow: hidden; height: 68px; }
+/* -136px (one tile + gap) pulls the leading duplicate off the left edge so the
+   first real tile still lands on the 16px text inset. */
+.carousel__track { display: flex; gap: 8px; width: max-content; height: 107px; margin-left: -136px; animation: carousel-scroll 16.67s linear infinite; }
 .carousel__track img { width: 128px; height: 107px; object-fit: cover; border-radius: 16px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.03); }
 
+/* Exactly one set of 6 tiles (6 × (128px + 8px)), so the wrap is invisible. */
 @keyframes carousel-scroll {
   0% { transform: translateX(0); }
-  100% { transform: translateX(calc(-50% - 4px)); }
+  100% { transform: translateX(calc(-6 * (128px + 8px))); }
 }
 
 .home__sc-wrapper { padding: 16px; flex-shrink: 0; }
@@ -77,7 +99,7 @@ button { font-family: var(--font); cursor: pointer; border: none; background: no
 .product-card__discount { font-size: 17px; font-weight: 700; line-height: 22px; letter-spacing: -0.408px; color: var(--color-discount); }
 
 /* ── Tab Bar ── */
-.tab-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--color-bg); border-top: 1px solid var(--color-border); display: flex; flex-direction: column; z-index: 100; }
+.tab-bar { flex-shrink: 0; width: 100%; background: var(--color-bg); border-top: 1px solid var(--color-border); display: flex; flex-direction: column; z-index: 100; }
 .tab-bar__items { display: flex; align-items: center; justify-content: space-between; height: 50px; }
 .tab-bar__home-indicator { height: calc(30px + var(--safe-bottom)); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; }
 .tab-bar__home-bar { width: 134px; height: 5px; background: #000; border-radius: 100px; }
@@ -91,48 +113,168 @@ button { font-family: var(--font); cursor: pointer; border: none; background: no
 /* ── Back button (shared) ── */
 .back-btn { font-size: 28px; color: var(--color-primary); line-height: 1; padding: 4px 8px 4px 4px; background: none; border: none; min-width: 40px; }
 
-/* ── Smart Collections ── */
-.sc-screen { display: flex; flex-direction: column; height: 100%; }
-.sc-screen__header { padding: 12px 16px 0; flex-shrink: 0; }
-.sc-screen__content { flex: 1; overflow-y: auto; padding: 0 16px 32px; -webkit-overflow-scrolling: touch; }
-.sc-screen__title { font-size: 28px; font-weight: 800; color: var(--color-text); margin: 8px 0 20px; }
+/* ── Smart Collections ──
+   Figma authored this screen 440px wide and squeezed the group into the 430px
+   frame, so every reported value carries a 0.97727 scale factor (15.636 = 16,
+   19.545 = 20, 336.182 = 344 …). The values below are the un-scaled design
+   tokens, which is what the type styles actually are (iOS Title1 Bold 28/34,
+   Body Semibold 17/22, Footnote 13/18). */
+.sc { display: flex; flex-direction: column; height: 100%; background: var(--color-bg); }
 
-.sc-section { margin-bottom: 28px; }
-.sc-section__heading { font-size: 17px; font-weight: 700; color: var(--color-text); margin-bottom: 12px; }
+/* Nav bar: pinned, no status bar — the real device draws it. The inline title
+   and hairline are revealed by .sc__nav--collapsed once the large title is gone. */
+.sc__nav { position: relative; flex-shrink: 0; height: 44px; background: var(--color-bg); z-index: 2; }
+.sc__nav::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--color-border); opacity: 0; transition: opacity 200ms ease; }
+.sc__nav--collapsed::after { opacity: 1; }
+.sc__back { position: absolute; left: 12px; top: 10px; width: 24px; height: 24px; padding: 0; z-index: 1; }
+.sc__back img { width: 24px; height: 24px; }
+/* iOS nav title — Body Semibold, the same 17/22/-0.408 token as the tile names. */
+.sc__nav-title { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 17px; font-weight: 600; line-height: 22px; letter-spacing: -0.408px; color: var(--color-large-title); white-space: nowrap; opacity: 0; transition: opacity 200ms ease; }
+.sc__nav--collapsed .sc__nav-title { opacity: 1; }
 
-.sc-row { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+/* Large title scrolls inside .sc__scroll; JS fades it out as it travels up. */
+.sc__subheader { height: 56px; display: flex; align-items: center; padding: 0 16px; }
+.sc__title { font-size: 34px; font-weight: 700; line-height: 41px; letter-spacing: 0.37px; color: var(--color-large-title); white-space: nowrap; }
+
+/* overflow-x: hidden clips the rows' negative-margin bleed at the frame edge,
+   instead of letting it drag the whole page sideways. */
+.sc__scroll { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+.sc__content { display: flex; flex-direction: column; gap: 13px; padding: 16px; }
+
+.sc-section { display: flex; flex-direction: column; gap: 16px; }
+.sc-section__header { display: flex; align-items: center; gap: 2px; }
+.sc-section__header--spaced { padding-top: 16px; }
+.sc-section__title { font-size: 20px; font-weight: 600; line-height: 24px; letter-spacing: 0.38px; color: var(--color-fg-black); white-space: nowrap; }
+
+/* Rows bleed to the frame edge so tiles can scroll fully out of view, while the
+   16px lead padding keeps the first tile aligned with the headings at rest. */
+.sc-row { display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -16px; padding: 0 16px; scrollbar-width: none; }
 .sc-row::-webkit-scrollbar { display: none; }
+.sc-row--large { gap: 16px; align-items: flex-start; }
+.sc-row--square { gap: 12px; align-items: center; }
 
-.collection-card { flex-shrink: 0; border-radius: 16px; overflow: hidden; background-size: cover; background-position: center; position: relative; text-align: left; -webkit-tap-highlight-color: transparent; border: none; }
-.collection-card--large { width: 200px; height: 260px; scroll-snap-align: start; }
-.collection-card--small { width: 160px; height: 200px; scroll-snap-align: start; }
-.collection-card__overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 12px; background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%); }
-.collection-card__title { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.2; }
-.collection-card__dates { font-size: 12px; color: rgba(255,255,255,0.85); margin-top: 3px; }
+.sc-tile { position: relative; flex-shrink: 0; overflow: hidden; border: 1px solid var(--color-grey-50); padding: 0; text-align: left; -webkit-tap-highlight-color: transparent; }
+.sc-tile__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.sc-tile--large { width: 283px; height: 344px; border-radius: 26.67px; }
+.sc-tile--square { width: 191px; height: 191px; border-radius: 16px; }
+.sc-tile--full { width: 100%; height: 200px; border-radius: 16px; }
 
-.year-pills { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px; padding-bottom: 4px; }
-.year-pills::-webkit-scrollbar { display: none; }
-.year-pill { flex-shrink: 0; height: 34px; padding: 0 16px; border-radius: 17px; border: 1.5px solid var(--color-border); font-size: 14px; font-weight: 500; color: var(--color-text); background: #fff; -webkit-tap-highlight-color: transparent; }
-.year-pill--active { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+/* Overlay is inset by -1px on three sides so the gradient covers the tile border. */
+.sc-tile__overlay { position: absolute; left: -1px; right: -1px; bottom: -1px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 4px; padding: 12px; }
+.sc-tile__overlay--large { height: 170px; align-items: center; justify-content: center; gap: 8px; padding: 20px 12px; }
+/* The darkening gradient is a pseudo-element, not the overlay's own background,
+   so it paints *after* the blur layers — the photo blurs, the gradient stays
+   crisp. Text is z-index: 1 to clear both. */
+.sc-tile__overlay::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%); }
 
-.all-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.all-grid .collection-card { width: 100%; height: 160px; }
+/* ── Progressive blur ──
+   backdrop-filter can only apply one uniform radius, which leaves a hard line
+   where the blurred box starts. Six layers instead: each samples everything
+   painted behind it (the photo plus the layers above it in the stack) and is
+   masked to fade in lower than the last, so the radii compound into a smooth
+   0 → ~10px ramp down the overlay — matching the design's progressive blur. */
+.pblur { position: absolute; inset: 0; pointer-events: none; }
+.pblur > span { position: absolute; inset: 0; display: block; }
+.pblur > span:nth-child(1) { backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000 25%); mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000 25%); }
+.pblur > span:nth-child(2) { backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 15%, #000 40%); mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 15%, #000 40%); }
+.pblur > span:nth-child(3) { backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 30%, #000 55%); mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 30%, #000 55%); }
+.pblur > span:nth-child(4) { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 45%, #000 70%); mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 45%, #000 70%); }
+.pblur > span:nth-child(5) { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 60%, #000 85%); mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 60%, #000 85%); }
+.pblur > span:nth-child(6) { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 75%, #000 100%); mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 75%, #000 100%); }
 
-/* ── Collection Detail ── */
-.cd-screen { display: flex; flex-direction: column; height: 100%; }
-.cd-screen__header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; flex-shrink: 0; }
-.cd-screen__title { font-size: 17px; font-weight: 600; color: var(--color-text); }
-.cd-screen__grid { flex: 1; overflow-y: auto; padding: 0 16px 100px; -webkit-overflow-scrolling: touch; }
-.cd-date-group { margin-bottom: 20px; }
-.cd-date-label { font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 8px; }
-.cd-photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
-.cd-photo { aspect-ratio: 1; background-size: cover; background-position: center; position: relative; border-radius: 2px; -webkit-tap-highlight-color: transparent; border: none; }
-.cd-photo__check { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 13px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 150ms; pointer-events: none; }
-.cd-photo--selected .cd-photo__check { opacity: 1; }
-.cd-photo--selected::after { content: ''; position: absolute; inset: 0; border: 3px solid var(--color-primary); border-radius: 2px; pointer-events: none; }
+.sc-tile__title { position: relative; z-index: 1; width: 100%; font-size: 28px; font-weight: 700; line-height: 34px; letter-spacing: 0.36px; color: var(--color-fg-white); text-align: center; }
+.sc-tile__name { position: relative; z-index: 1; width: 100%; font-size: 17px; font-weight: 600; line-height: 22px; letter-spacing: -0.408px; color: var(--color-fg-white); }
+.sc-tile__meta { position: relative; z-index: 1; display: flex; align-items: center; gap: 4px; width: 100%; }
+.sc-tile__meta--center { justify-content: center; }
+.sc-tile__sub { font-size: 13px; font-weight: 400; line-height: 18px; letter-spacing: -0.08px; color: var(--color-fg-white); white-space: nowrap; }
+.sc-tile__sub--muted { color: var(--color-alpha-white-75); }
 
-.cd-cta { position: absolute; bottom: 0; left: 0; right: 0; padding: 12px 16px calc(12px + var(--safe-bottom)); background: var(--color-bg); border-top: 1px solid var(--color-border); }
-.cta-btn { width: 100%; height: 52px; border-radius: 14px; background: var(--color-primary); color: #fff; font-size: 17px; font-weight: 600; border: none; }
+/* Year jump links. Sticky to the top of the scrollport, which is directly under
+   the pinned nav bar. z-index clears the tiles' z-index: 1 text so cards scroll
+   under the row; the opaque background is the design's own bg-white. */
+.sc-years { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 8px; height: 50px; background: var(--color-bg); overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -16px; padding: 0 16px; scrollbar-width: none; scroll-behavior: smooth; }
+.sc-years::-webkit-scrollbar { display: none; }
+/* Transparent border on the inactive pill keeps both states the same height. */
+.sc-year { flex-shrink: 0; padding: 8px 13px; border-radius: 25px; border: 1px solid transparent; background: var(--color-bg-secondary); font-size: 13px; font-weight: 600; line-height: 18px; letter-spacing: -0.08px; color: var(--color-fg-black); -webkit-tap-highlight-color: transparent; }
+.sc-year--active { background: var(--color-secondary-100); border-color: var(--color-secondary-400); color: var(--color-fg-secondary); }
+
+.sc-all { display: flex; flex-direction: column; gap: 13px; }
+
+/* ── Collection Detail (album page) ──
+   This frame is authored at 375px with no group scale, so the reported values
+   are the tokens as-is (44, 12/10, 16/8/12/8, 1px gap). The only adaptation is
+   the grid: Figma pins tiles at 124.3px for a 375px frame, which is 3 columns
+   with 1px gutters — expressed here as repeat(3, 1fr) so it fills any width. */
+.cd { display: flex; flex-direction: column; height: 100%; background: var(--color-bg); }
+
+.cd__nav { position: relative; flex-shrink: 0; height: 44px; background: var(--color-bg); z-index: 2; }
+.cd__back { position: absolute; left: 12px; top: 10px; width: 24px; height: 24px; padding: 0; }
+.cd__back img { width: 24px; height: 24px; }
+/* Title block is centred on the nav bar, not on the space between the controls,
+   so it stays put regardless of how wide "Select all" renders. */
+.cd__titles { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); height: 38px; display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 60%; }
+.cd__title { font-size: 17px; font-weight: 600; line-height: 22px; letter-spacing: -0.41px; color: var(--color-fg-black); text-align: center; white-space: nowrap; }
+.cd__count { font-size: 11px; font-weight: 400; line-height: normal; color: var(--color-text-secondary); white-space: nowrap; }
+.cd__select-all { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 600; line-height: 18px; letter-spacing: -0.08px; color: var(--color-fg-secondary); padding: 0; }
+
+.cd__scroll { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+
+/* 1px gaps let the white page show through as hairlines between tiles. */
+.cd-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--color-bg); }
+
+/* Date header spans the full grid row and sticks under the pinned nav. */
+.cd-day { grid-column: 1 / -1; position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 4px; padding: 16px 8px 8px 12px; background: var(--color-fg-white); }
+.cd-day__date { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; line-height: 20px; letter-spacing: -0.24px; color: var(--color-fg-black); }
+
+.cd-select { flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 4px 12px 4px 4px; border-radius: 40px; background: var(--color-grey-25); -webkit-tap-highlight-color: transparent; }
+.cd-select__icon { width: 20px; height: 20px; flex-shrink: 0; }
+.cd-select__icon img { width: 20px; height: 20px; }
+.cd-select__label { font-size: 13px; font-weight: 600; line-height: 18px; letter-spacing: -0.08px; color: var(--color-fg-secondary); }
+
+/* Placeholder photo. The design's per-tile select dot is opacity 0 in this
+   state, so there is nothing to draw on top yet. */
+.cd-tile { position: relative; display: block; width: 100%; padding: 0; aspect-ratio: 1; background: var(--color-bg-secondary); -webkit-tap-highlight-color: transparent; cursor: default; }
+
+/* ── Select mode ──
+   Select / Select all stay hidden until the user picks "Create a photo book". */
+/* Clip the parked (off-screen) sheet so it can't be scrolled into view. */
+.cd { position: relative; overflow: hidden; }
+.cd__select-all, .cd-select { visibility: hidden; }
+.cd--selecting .cd__select-all, .cd--selecting .cd-select { visibility: visible; }
+.cd--selecting .cd-tile { cursor: pointer; }
+
+.cd-tile__check { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--color-fg-white); background: rgba(0,0,0,0.12); opacity: 0; transition: opacity 150ms ease; }
+.cd--selecting .cd-tile__check { opacity: 1; }
+.cd-tile--selected::after { content: ''; position: absolute; inset: 0; border: 2px solid var(--color-fg-secondary); pointer-events: none; }
+.cd-tile--selected .cd-tile__check { border-color: var(--color-fg-secondary); background: var(--color-fg-secondary) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 10.3l3 3 6-6' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 16px no-repeat; }
+
+/* Floating Create button; hidden in select mode, where the shared bar takes over. */
+/* Top/width are driven from JS (see dock() in collection-detail.js). */
+.cd-fab { position: absolute; left: 50%; top: calc(100% - 72px - var(--safe-bottom)); z-index: 5; transform: translateX(-50%); height: 48px; padding: 0 32px; border-radius: 24px; background: var(--color-primary); color: var(--color-fg-white); font-size: 17px; font-weight: 600; line-height: 22px; letter-spacing: -0.408px; white-space: nowrap; box-shadow: 0 4px 16px rgba(0,0,0,calc(0.18 * var(--fab-shadow, 1))); -webkit-tap-highlight-color: transparent; transition: opacity 200ms ease; }
+.cd--selecting .cd-fab { opacity: 0; pointer-events: none; }
+
+/* "What you can do here" block after the grid. */
+.cd-promo { margin: 24px 16px 0; padding: 20px 16px 16px; border-radius: 16px; background: var(--color-grey-25); border: 1px solid var(--color-grey-50); margin-bottom: calc(24px + var(--safe-bottom)); }
+.cd-promo__title { font-size: 20px; font-weight: 600; line-height: 24px; letter-spacing: 0.38px; color: var(--color-fg-black); }
+.cd-promo__text { margin-top: 6px; font-size: 15px; line-height: 20px; letter-spacing: -0.24px; color: var(--color-text-secondary); }
+.cd-promo__list { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.cd-promo__item { display: flex; align-items: flex-start; gap: 12px; }
+.cd-promo__icon { flex-shrink: 0; width: 40px; height: 40px; border-radius: 10px; background: var(--color-secondary-100); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.cd-promo__name { display: block; font-size: 15px; font-weight: 600; line-height: 20px; letter-spacing: -0.24px; color: var(--color-fg-black); }
+.cd-promo__sub { display: block; margin-top: 2px; font-size: 13px; line-height: 18px; letter-spacing: -0.08px; color: var(--color-text-secondary); }
+.cd-promo__slot { height: 48px; margin-top: 20px; }
+/* In select mode the shared bar takes over: drop the promo, leave room for the bar. */
+.cd--selecting .cd-promo { display: none; }
+.cd--selecting .cd-grid { padding-bottom: calc(96px + var(--safe-bottom)); }
+
+.cd .sheet-backdrop { z-index: 9; }
+.cd-sheet .sheet__options { padding-top: 4px; }
 
 /* ── Create Options Sheet ── */
 .sheet-screen { position: absolute; inset: 0; }
@@ -182,3 +324,27 @@ button { font-family: var(--font); cursor: pointer; border: none; background: no
 .editor-hint { font-size: 12px; color: var(--color-text-secondary); margin-top: 16px; }
 .editor-toolbar { display: flex; justify-content: space-around; padding: 12px 16px calc(12px + var(--safe-bottom)); background: var(--color-bg); border-top: 1px solid var(--color-border); flex-shrink: 0; }
 .editor-tool { font-size: 14px; font-weight: 500; color: var(--color-text); padding: 6px 12px; border-radius: 8px; background: #F2F2F7; border: none; }
+
+/* ── Shared selection bar (js/selection.js) ──
+   Sits in #app above the screens so it stays put across navigation. */
+.sel-bar { position: absolute; left: 16px; right: 16px; bottom: calc(24px + var(--safe-bottom)); z-index: 50; display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 8px; border-radius: 24px; background: var(--color-fg-black); color: var(--color-fg-white); box-shadow: 0 4px 16px rgba(0,0,0,0.18); opacity: 0; pointer-events: none; transform: translateY(12px); transition: opacity 200ms ease, transform 200ms ease; }
+.sel-bar--visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.sel-bar__cancel { height: 32px; padding: 0 12px; border-radius: 16px; background: rgba(255,255,255,0.14); color: var(--color-fg-white); font-size: 13px; font-weight: 600; letter-spacing: -0.08px; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
+.sel-bar__text { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; line-height: 20px; letter-spacing: -0.24px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sel-bar__next { height: 32px; padding: 0 16px; border-radius: 16px; background: var(--color-primary); color: var(--color-fg-white); font-size: 13px; font-weight: 600; letter-spacing: -0.08px; flex-shrink: 0; display: none; -webkit-tap-highlight-color: transparent; }
+.sel-bar--has-selection .sel-bar__next { display: block; }
+/* Room under the last Smart Collections tile so the bar never covers it. */
+.sc__content { padding-bottom: calc(96px + var(--safe-bottom)); }
+
+/* Leave-confirmation alert, iOS style. */
+.sel-alert { position: absolute; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transition: opacity 200ms ease; }
+.sel-alert--visible { opacity: 1; pointer-events: auto; }
+.sel-alert__box { width: 270px; border-radius: 14px; background: rgba(242,242,242,0.97); text-align: center; overflow: hidden; transform: scale(1.1); transition: transform 200ms ease; }
+.sel-alert--visible .sel-alert__box { transform: scale(1); }
+.sel-alert__title { padding: 19px 16px 2px; font-size: 17px; font-weight: 600; line-height: 22px; letter-spacing: -0.408px; color: #000; }
+.sel-alert__msg { padding: 0 16px 19px; font-size: 13px; line-height: 18px; letter-spacing: -0.08px; color: #000; }
+.sel-alert__actions { display: flex; border-top: 0.5px solid rgba(60,60,67,0.29); }
+.sel-alert__btn { flex: 1; height: 44px; font-size: 17px; line-height: 22px; letter-spacing: -0.408px; color: var(--color-primary); font-weight: 400; }
+.sel-alert__btn + .sel-alert__btn { border-left: 0.5px solid rgba(60,60,67,0.29); }
+.sel-alert__btn[data-choice="stay"] { font-weight: 600; }
+.sel-alert__btn--destructive { color: #ff3b30; }
