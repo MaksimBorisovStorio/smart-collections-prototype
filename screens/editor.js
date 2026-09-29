@@ -94,7 +94,11 @@ Router.register('editor', {
     `;
   },
 
-  mount() {},
+  // Done ends the test run: a full reload to Home clears selection and state
+  // (nothing is persisted), so the next participant starts fresh.
+  mount(el) {
+    el.querySelector('#ed-done').addEventListener('click', () => window.location.replace(window.location.pathname));
+  },
 
   unmount() {}
 });
