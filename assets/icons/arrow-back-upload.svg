@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="icon/home">
+<g id="bounding-box">
+</g>
+<mask id="mask0_0_40" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="4" y="3" width="10" height="18">
+<path id="Path" d="M13.6567 3.35252C13.2005 2.88249 12.465 2.88249 12.0088 3.35252L4.27231 11.3237C3.90923 11.6978 3.90923 12.3022 4.27231 12.6763L12.0088 20.6475C12.465 21.1175 13.2005 21.1175 13.6567 20.6475C14.1129 20.1775 14.1129 19.4197 13.6567 18.9496L6.91632 11.9952L13.666 5.04077C14.1129 4.58034 14.1129 3.81295 13.6567 3.35252Z" fill="white"/>
+</mask>
+<g mask="url(#mask0_0_40)">
+<path id="colour" fill-rule="evenodd" clip-rule="evenodd" d="M0 0H24V24H0V0Z" fill="#007377"/>
+</g>
+</g>
+</svg>

@@ -13,6 +13,7 @@
   --color-text-secondary: #777777;
   --color-discount: #f25f70;
   --color-border: #cccccc;
+  --color-orange: #f4633a;          /* promo badge, measured from PDP screenshot */
   /* Smart Collections — exact Figma design-system tokens */
   --color-fg-black: #333333;        /* colour/foreground/fg-black */
   --color-fg-secondary: #007377;    /* colour/foreground/fg-secondary */
@@ -97,6 +98,8 @@ button { font-family: var(--font); cursor: pointer; border: none; background: no
 .product-card__body { padding: 24px; display: flex; flex-direction: column; gap: 8px; }
 .product-card__name { font-size: 17px; font-weight: 600; line-height: 22px; letter-spacing: -0.408px; color: var(--color-text); }
 .product-card__discount { font-size: 17px; font-weight: 700; line-height: 22px; letter-spacing: -0.408px; color: var(--color-discount); }
+.product-card__price { font-size: 17px; font-weight: 400; line-height: 22px; letter-spacing: -0.408px; color: var(--color-fg-black); }
+.product-card__price b { font-weight: 700; }
 
 /* ── Tab Bar ── */
 .tab-bar { flex-shrink: 0; width: 100%; background: var(--color-bg); border-top: 1px solid var(--color-border); display: flex; flex-direction: column; z-index: 100; }
@@ -240,10 +243,10 @@ button { font-family: var(--font); cursor: pointer; border: none; background: no
 /* Placeholder photo. The design's per-tile select dot is opacity 0 in this
    state, so there is nothing to draw on top yet. */
 .cd-tile { position: relative; display: block; width: 100%; padding: 0; aspect-ratio: 1; background: var(--color-bg-secondary); -webkit-tap-highlight-color: transparent; cursor: default; }
+.cd-tile__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 /* ── Select mode ──
    Select / Select all stay hidden until the user picks "Create a photo book". */
-/* Clip the parked (off-screen) sheet so it can't be scrolled into view. */
 .cd { position: relative; overflow: hidden; }
 .cd__select-all, .cd-select { visibility: hidden; }
 .cd--selecting .cd__select-all, .cd--selecting .cd-select { visibility: visible; }
@@ -273,8 +276,6 @@ button { font-family: var(--font); cursor: pointer; border: none; background: no
 .cd--selecting .cd-promo { display: none; }
 .cd--selecting .cd-grid { padding-bottom: calc(96px + var(--safe-bottom)); }
 
-.cd .sheet-backdrop { z-index: 9; }
-.cd-sheet .sheet__options { padding-top: 4px; }
 
 /* ── Create Options Sheet ── */
 .sheet-screen { position: absolute; inset: 0; }
@@ -306,24 +307,8 @@ button { font-family: var(--font); cursor: pointer; border: none; background: no
 .option-pill--active { border-color: var(--color-primary); color: var(--color-primary); background: rgba(46,139,135,0.08); }
 
 /* ── PDP ── */
-.pdp-screen { display: flex; flex-direction: column; height: 100%; }
-.pdp-content { padding: 0 16px 100px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
-.pdp-preview { width: 100%; margin-bottom: 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
-.pdp-title { font-size: 20px; font-weight: 700; color: var(--color-text); margin-bottom: 6px; }
-.pdp-specs { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 4px; }
-.pdp-price { font-size: 22px; font-weight: 700; color: var(--color-primary); margin: 8px 0; }
-.pdp-desc { font-size: 14px; color: var(--color-text-secondary); line-height: 1.5; }
 
 /* ── Editor ── */
-.editor-screen { display: flex; flex-direction: column; height: 100%; background: #F2F2F7; }
-.editor-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--color-bg); border-bottom: 1px solid var(--color-border); flex-shrink: 0; }
-.editor-header__save { font-size: 16px; font-weight: 600; color: var(--color-primary); background: none; border: none; }
-.editor-canvas { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
-.editor-spread { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; width: 100%; max-width: 320px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.15); background: #fff; }
-.editor-photo { aspect-ratio: 1; background-size: cover; background-position: center; }
-.editor-hint { font-size: 12px; color: var(--color-text-secondary); margin-top: 16px; }
-.editor-toolbar { display: flex; justify-content: space-around; padding: 12px 16px calc(12px + var(--safe-bottom)); background: var(--color-bg); border-top: 1px solid var(--color-border); flex-shrink: 0; }
-.editor-tool { font-size: 14px; font-weight: 500; color: var(--color-text); padding: 6px 12px; border-radius: 8px; background: #F2F2F7; border: none; }
 
 /* ── Shared selection bar (js/selection.js) ──
    Sits in #app above the screens so it stays put across navigation. */
@@ -333,6 +318,10 @@ button { font-family: var(--font); cursor: pointer; border: none; background: no
 .sel-bar__text { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; line-height: 20px; letter-spacing: -0.24px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sel-bar__next { height: 32px; padding: 0 16px; border-radius: 16px; background: var(--color-primary); color: var(--color-fg-white); font-size: 13px; font-weight: 600; letter-spacing: -0.08px; flex-shrink: 0; display: none; -webkit-tap-highlight-color: transparent; }
 .sel-bar--has-selection .sel-bar__next { display: block; }
+/* Info-only pill on the book-choice screens: same spot, shrinks to the count. */
+.sel-bar--info { right: auto; left: 50%; translate: -50% 0; padding: 8px 20px; }
+.sel-bar--info .sel-bar__cancel, .sel-bar--info .sel-bar__next { display: none; }
+.sel-bar--info .sel-bar__text { flex: none; text-align: center; }
 /* Room under the last Smart Collections tile so the bar never covers it. */
 .sc__content { padding-bottom: calc(96px + var(--safe-bottom)); }
 
@@ -348,3 +337,158 @@ button { font-family: var(--font); cursor: pointer; border: none; background: no
 .sel-alert__btn + .sel-alert__btn { border-left: 0.5px solid rgba(60,60,67,0.29); }
 .sel-alert__btn[data-choice="stay"] { font-weight: 600; }
 .sel-alert__btn--destructive { color: #ff3b30; }
+
+/* ── Choose photo book (book-orientation) — Figma 1618:63200 ──
+   Cards are the Home .product-card; only the nav and button reset live here. */
+.bo { display: flex; flex-direction: column; height: 100%; background: var(--color-bg); }
+.bo__nav { position: relative; flex-shrink: 0; height: 44px; background: var(--color-bg); z-index: 2; }
+.bo__back { position: absolute; left: 12px; top: 10px; width: 24px; height: 24px; padding: 0; }
+.bo__back img { width: 24px; height: 24px; }
+.bo__title { position: absolute; left: 50%; top: calc(50% - 11px); transform: translateX(-50%); width: 263px; font-size: 17px; font-weight: 600; line-height: 22px; letter-spacing: -0.41px; color: var(--color-fg-black); text-align: center; }
+.bo__scroll { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+/* Room under the last card for the floating selection pill. */
+.bo__scroll > :last-child { padding-bottom: calc(96px + var(--safe-bottom)); }
+.bo__card { display: block; width: 100%; padding: 0; text-align: left; -webkit-tap-highlight-color: transparent; }
+.bo__card .product-card__body { display: flex; }
+
+/* ── Book options — Figma 1038:12844 (measured from the @3x screenshot) ──
+   Nav and card shell are shared with Choose photo book. */
+.bopt__list { display: flex; flex-direction: column; gap: 24px; padding: 24px 16px calc(24px + var(--safe-bottom)); }
+.bopt__img { height: 224px; background: var(--color-bg-secondary); }
+.bopt__price { display: flex; align-items: baseline; gap: 5px; font-size: 15px; font-weight: 400; line-height: 24px; letter-spacing: -0.24px; color: var(--color-fg-black); }
+.bopt__price b { font-size: 22px; font-weight: 700; letter-spacing: 0.35px; }
+
+/* ── Product page — Figma 1038:12862 (measured from the @3x screenshot) ── */
+.pdp { display: flex; flex-direction: column; height: 100%; background: var(--color-bg); }
+.pdp__scroll { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+/* Square hero; back hit area sits on the baked-in button (20,70 / 32px of 430). */
+.pdp__hero { position: relative; aspect-ratio: 1; background: var(--color-bg-secondary); }
+.pdp__hero-img { width: 100%; height: 100%; object-fit: cover; }
+.pdp__back { position: absolute; left: 4.65%; top: 16.28%; width: 7.44%; aspect-ratio: 1; border-radius: 50%; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+.pdp__info { padding: 16px 16px 24px; color: var(--color-fg-black); }
+.pdp__title { font-size: 22px; font-weight: 700; line-height: 28px; letter-spacing: 0.35px; }
+.pdp__price-row { display: flex; align-items: center; gap: 9px; margin-top: 14px; }
+.pdp__price { display: flex; align-items: baseline; gap: 5px; font-size: 13px; line-height: 24px; letter-spacing: -0.08px; }
+.pdp__price b { font-size: 22px; font-weight: 700; letter-spacing: 0.35px; }
+.pdp__promo { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 4px 0 4px; border: 1px solid var(--color-orange); border-radius: 4px; font-size: 13px; font-weight: 600; line-height: 18px; letter-spacing: -0.08px; color: var(--color-orange); white-space: nowrap; }
+.pdp__promo img { width: 16px; height: 16px; }
+.pdp__desc { margin-top: 13px; font-size: 17px; line-height: 22px; letter-spacing: -0.408px; }
+.pdp__features { list-style: none; display: grid; grid-template-columns: 1fr 1fr; margin-top: 26px; }
+.pdp__feature { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; line-height: 16px; text-align: center; }
+.pdp__feature img { width: 24px; height: 24px; }
+.pdp__delivery { display: flex; align-items: center; gap: 14px; margin-top: 23px; padding: 24px 16px; border-radius: 12px; background: var(--color-grey-25); }
+.pdp__delivery-icon { flex-shrink: 0; width: 35px; height: 35px; }
+.pdp__delivery-text { font-size: 17px; line-height: 22px; letter-spacing: -0.408px; }
+.pdp__link { padding: 0; font-size: 15px; line-height: 20px; letter-spacing: -0.24px; color: var(--color-fg-secondary); }
+.pdp__usp { display: flex; align-items: center; gap: 16px; margin-top: 16px; font-size: 17px; line-height: 22px; letter-spacing: -0.408px; }
+.pdp__usp img { width: 24px; height: 24px; }
+
+.pdp__cta { flex-shrink: 0; padding: 9px 16px max(44px, calc(10px + var(--safe-bottom))); border-top: 1px solid var(--color-border); background: var(--color-bg); }
+.pdp__create { display: block; width: 100%; height: 45px; border-radius: 4px; background: var(--color-primary); color: var(--color-fg-white); font-size: 17px; font-weight: 600; line-height: 22px; letter-spacing: -0.408px; -webkit-tap-highlight-color: transparent; }
+
+/* ── Uploading your creation — Figma 1038:12848 ── */
+.upl { position: relative; height: 100%; background: var(--color-bg); overflow: hidden; }
+.upl__nav { position: relative; height: 44px; background: var(--color-bg); }
+.upl__back { position: absolute; left: 16px; top: 10px; width: 24px; height: 24px; padding: 0; }
+.upl__back img { width: 24px; height: 24px; }
+.upl__body { display: flex; flex-direction: column; gap: 24px; padding-top: 16px; }
+.upl__head { display: flex; flex-direction: column; gap: 16px; padding: 0 16px; color: #000; letter-spacing: -0.3px; }
+.upl__title { font-size: 32px; font-weight: 700; line-height: 40px; }
+.upl__text { font-size: 14px; line-height: normal; }
+.upl__progress { display: flex; flex-direction: column; gap: 12px; padding: 0 16px; }
+.upl__bar { height: 16px; border-radius: 4px; background: rgba(41,41,41,0.08); overflow: hidden; }
+.upl__fill { width: 1%; min-width: 8px; height: 100%; background: var(--color-primary); }
+.upl__status { display: flex; justify-content: space-between; font-size: 14px; line-height: normal; letter-spacing: -0.3px; color: rgba(41,41,41,0.6); white-space: nowrap; }
+/* Animated illustration pinned above the home indicator (374 × 199 of 375). */
+.upl__art { position: absolute; right: 0; bottom: max(34px, var(--safe-bottom)); width: 99.73%; aspect-ratio: 500 / 266; object-fit: cover; }
+
+@font-face { font-family: 'Bebas Neue'; src: url('../assets/fonts/bebas-neue.woff2') format('woff2'); font-display: swap; }
+
+/* ── Editor: Edit design / book overview — Figma 1137:11916 ──
+   Brandon Text (licensed) isn't bundled, so UI text uses the system font;
+   the book title uses the bundled Bebas Neue (OFL). */
+.ed { position: relative; height: 100%; overflow: hidden; background: var(--color-bg-secondary); }
+.ed__scroll { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 79px 0 calc(32px + var(--safe-bottom)); }
+
+.ed__header { position: absolute; top: 0; left: 0; right: 0; height: 56px; background: var(--color-bg); z-index: 3; }
+.ed__left { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 4px; padding: 0 4px; }
+.ed__menu { display: flex; align-items: center; justify-content: center; height: 48px; padding: 0 12px; border-radius: 4px; }
+.ed__menu img { width: 24px; height: 24px; }
+.ed__title { font-size: 16px; font-weight: 700; line-height: 18px; color: #3c3c3b; white-space: nowrap; }
+.ed__right { position: absolute; right: 8px; bottom: 8px; height: 40px; display: flex; align-items: center; gap: 16px; }
+.ed__saving { width: 24px; height: 24px; }
+.ed__done { height: 40px; padding: 0 16px; border-radius: 4px; background: var(--color-fg-secondary); color: var(--color-fg-white); font-size: 16px; font-weight: 700; line-height: 24px; }
+
+.ed__history { position: absolute; top: 71px; left: 8px; width: 101px; height: 40px; border-radius: 4px; background: var(--color-fg-white); z-index: 3; }
+.ed__hist { position: absolute; top: 9px; width: 24px; height: 24px; padding: 0; opacity: 0.5; }
+.ed__hist--undo { left: 12px; }
+.ed__hist--redo { left: 63px; }
+.ed__hist img { position: absolute; left: 10.65%; right: 10.65%; }
+.ed__hist--undo img { top: 26.81%; bottom: 34.26%; }
+.ed__hist--redo img { top: 29.13%; bottom: 32.41%; }
+
+/* One spread = 320 × 160 sheet + page labels underneath; 48px between spreads. */
+.ed-spread { position: relative; width: 320px; height: 160px; margin: 0 auto 48px; }
+.ed-sheet { position: relative; display: flex; width: 100%; height: 100%; box-shadow: 0 10px 20px rgba(0,0,0,0.15); background: var(--color-fg-white); }
+.ed-page { position: relative; flex: 0 0 160px; height: 160px; display: flex; align-items: center; justify-content: center; background: var(--color-fg-white); }
+.ed-page__add { width: 16px; height: 16px; }
+.ed-page__img { position: absolute; left: 50%; top: 50%; width: 150px; height: 148px; transform: translate(-50%, -50%); }
+.ed-slot { object-fit: cover; }
+.ed-slot--empty { background: var(--color-bg-secondary); }
+.ed-labels { position: absolute; top: 160px; left: 0; width: 320px; display: flex; justify-content: space-between; font-size: 12px; line-height: normal; color: var(--color-text); white-space: nowrap; }
+.ed-labels--center { justify-content: center; padding: 0 6px; }
+
+/* Centre fold and spine edges. Figma's exported line SVGs (drop-shadowed 0.5px
+   strokes) render ~5x darker in Chrome than in Figma, so these are CSS
+   equivalents tuned to the Figma render's pixel values. */
+.ed-fold { position: absolute; left: 50%; top: 0; bottom: 0; width: 24px; transform: translateX(-50%); pointer-events: none;
+  background: linear-gradient(90deg, rgba(0,0,0,0) 0, rgba(0,0,0,0.035) 11.5px, #e0e0e0 11.5px, #e0e0e0 12.5px, rgba(0,0,0,0.035) 12.5px, rgba(0,0,0,0) 24px); }
+.ed-cover__spine::before, .ed-cover__spine::after { content: ''; position: absolute; top: 0; bottom: 0; width: 12px; pointer-events: none; }
+.ed-cover__spine::before { right: 100%; background: linear-gradient(270deg, rgba(0,0,0,0.06), rgba(0,0,0,0)); border-right: 1px solid #c2c2c2; }
+/* The front cover paints over anything right of the spine, so this edge's shadow falls inward. */
+.ed-cover__spine::after { right: 0; width: 14px; background: linear-gradient(270deg, rgba(0,0,0,0.03), rgba(0,0,0,0)); border-right: 1px solid #c9c9c9; }
+
+.ed-cover__back { position: absolute; left: 0; top: 0; width: 152.5px; height: 160px; background: var(--color-fg-white); }
+.ed-cover__spine { position: absolute; left: 47.5%; right: 47.81%; top: 0; bottom: 0; background: var(--color-fg-white); }
+.ed-cover__front { position: absolute; left: 52.34%; right: 0; top: 0; bottom: 0; background: var(--color-fg-white); }
+.ed-cover__img { position: absolute; top: 6.17%; left: 9.18%; width: 81.73%; height: 76.16%; }
+.ed-cover__title, .ed-cover__spine-title { font-family: 'Bebas Neue', 'Oswald', 'Arial Narrow', Impact, sans-serif; font-stretch: condensed; text-transform: uppercase; color: #000; text-align: center; line-height: normal; white-space: nowrap; }
+.ed-cover__title { position: absolute; top: 88.5%; bottom: 6.5%; left: 9.18%; right: 9.09%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.ed-cover__spine-title { position: absolute; top: 10.71%; bottom: 10.36%; left: 4.17%; right: 0; display: flex; align-items: center; justify-content: center; writing-mode: vertical-rl; font-size: 15px; }
+
+/* ── How would you like to start your book? — Figma 1739:17075 ──
+   Design y values minus the 44px status bar. Card content is placed exactly as
+   in the frame; selection is an inset ring so nothing shifts when it moves. */
+.bs { position: relative; display: flex; flex-direction: column; height: 100%; background: var(--color-bg); }
+.bs__scroll { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 54px 16px 24px; }
+.bs__art { display: block; width: 235.96px; height: 204.27px; margin: 0 auto; filter: drop-shadow(4px 4px 5px rgba(0,0,0,0.15)); }
+.bs__title { width: 267px; margin: 18px auto 0; font-size: 20px; font-weight: 590; line-height: normal; color: #333; text-align: center; }
+.bs__back { position: absolute; left: 16px; top: 22px; width: 32px; height: 32px; padding: 0; z-index: 2; }
+.bs__back img { position: absolute; left: -6.25%; top: -6.25%; width: 115.63%; height: 115.63%; max-width: none; }
+
+.bs__options { display: flex; flex-direction: column; gap: 16px; margin-top: 23px; }
+.bs-card { position: relative; display: block; width: 100%; padding: 0; border-radius: 8px; background: var(--color-fg-white); box-shadow: 0 4px 16px rgba(0,0,0,0.15); text-align: left; color: var(--color-text); -webkit-tap-highlight-color: transparent; }
+.bs-card--auto { height: 156px; }
+.bs-card--manual { height: 118px; }
+.bs-card--selected { box-shadow: inset 0 0 0 2px var(--color-fg-secondary), 0 4px 16px rgba(0,0,0,0.15); }
+.bs-card__radio { position: absolute; left: 16px; width: 24px; height: 24px; }
+.bs-card__title { position: absolute; left: 48px; font-size: 16px; font-weight: 700; line-height: 24px; }
+.bs-card__list { position: absolute; left: 38px; list-style: none; }
+.bs-card__list li { display: flex; font-size: 16px; font-weight: 500; line-height: 24px; }
+.bs-card__list img { width: 24px; height: 24px; }
+.bs-card--auto .bs-card__radio { top: 22px; }
+.bs-card--auto .bs-card__title { top: 22px; }
+.bs-card--auto .bs-card__list { top: 61px; }
+.bs-card--manual .bs-card__radio { top: 20px; }
+.bs-card--manual .bs-card__title { top: 20px; }
+.bs-card--manual .bs-card__list { top: 53px; }
+.bs-card__badge { position: absolute; left: 276px; top: 7px; width: 60px; padding: 4px 8px; border-radius: 4px; background: var(--color-orange); color: var(--color-fg-white); font-size: 15px; font-weight: 500; line-height: normal; }
+
+.bs__cta { flex-shrink: 0; height: calc(94px + var(--safe-bottom)); padding: 14px 16px calc(14px + var(--safe-bottom)); border-top: 1px solid var(--color-border); background: var(--color-bg); }
+.bs__continue { display: block; width: 100%; height: 48px; border-radius: 4px; background: var(--color-fg-secondary); color: var(--color-fg-white); font-size: 16px; font-weight: 590; line-height: 24px; }
+
+/* Create sheet (js/selection.js) lives in #app, above the selection bar. */
+.sheet-backdrop.sel-sheet-backdrop { z-index: 55; }
+.sheet.sel-sheet { z-index: 56; }  /* beats .sheet { z-index: 10 } in transitions.css, which loads later */
+.sel-sheet .sheet__options { padding-top: 4px; }

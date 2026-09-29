@@ -5,13 +5,19 @@
    put while screens slide underneath it.
    Photo ids are "<collectionId>:<day>-<index>", unique across collections. */
 const Selection = (() => {
-  // Screens the bar is shown on while a session is active.
+  // Screens the bar is shown on while a session is active. On the book-choice
+  // screens it's an info pill only: the count, no Cancel / Continue.
   const BAR_ROUTES = ['collection', 'smart-collections'];
+  const INFO_ROUTES = ['book-orientation', 'book-options'];
 
   let active = false;
+  // What the selection is for: 'book' once the user picked "Create a photo
+  // book", null when select mode was started by tapping a photo. Continue asks
+  // via the sheet while it's still null.
+  let intent = null;
   const ids = new Set();
   const listeners = new Set();
-  let bar, text, next, dialog;
+  let bar, text, next, dialog, sheet, backdrop;
 
   function route() {
     return (window.location.hash.replace(/^#\/?/, '').split('/')[0]) || 'home';
@@ -30,7 +36,36 @@ const Selection = (() => {
     text = bar.querySelector('#sel-text');
     next = bar.querySelector('#sel-next');
     bar.querySelector('#sel-cancel').addEventListener('click', cancel);
-    next.addEventListener('click', () => Router.navigate('#/book-orientation'));
+    next.addEventListener('click', () => {
+      if (intent === 'book') return Router.navigate('#/book-orientation');
+      chooseIntent().then(choice => {
+        if (choice !== 'book') return;
+        intent = 'book';
+        Router.navigate('#/book-orientation');
+      });
+    });
+
+    // "Create" options sheet, shared by the album's Create button and Continue.
+    backdrop = document.createElement('div');
+    backdrop.className = 'sheet-backdrop sel-sheet-backdrop';
+    sheet = document.createElement('div');
+    sheet.className = 'sheet sel-sheet';
+    sheet.setAttribute('role', 'dialog');
+    sheet.setAttribute('aria-label', 'Create');
+    sheet.innerHTML = `
+      <div class="sheet__handle"></div>
+      <div class="sheet__options">
+        <button class="sheet-option" data-choice="book">
+          <span class="sheet-option__text"><span class="sheet-option__name">Create a photo book</span></span>
+          <span class="sheet-option__arrow">›</span>
+        </button>
+        <button class="sheet-option" data-choice="upload">
+          <span class="sheet-option__text"><span class="sheet-option__name">Upload to my photos</span></span>
+          <span class="sheet-option__arrow">›</span>
+        </button>
+      </div>`;
+    app.appendChild(backdrop);
+    app.appendChild(sheet);
 
     // iOS-style alert for leaving the flow.
     dialog = document.createElement('div');
@@ -52,15 +87,40 @@ const Selection = (() => {
 
   function render() {
     const n = ids.size;
-    bar.classList.toggle('sel-bar--visible', active && BAR_ROUTES.includes(route()));
+    const r = route();
+    const info = INFO_ROUTES.includes(r);
+    bar.classList.toggle('sel-bar--visible', active && (info || BAR_ROUTES.includes(r)));
+    bar.classList.toggle('sel-bar--info', info);
     bar.classList.toggle('sel-bar--has-selection', n > 0);
     text.textContent = n === 0 ? 'Start selecting photos' : `${n} photo${n === 1 ? '' : 's'} selected`;
     AppState.selectedPhotos = [...ids];
     listeners.forEach(fn => fn());
   }
 
-  function start() { active = true; render(); }
-  function cancel() { active = false; ids.clear(); render(); }
+  function start(why = null) { active = true; intent = why; render(); }
+  function cancel() { active = false; intent = null; ids.clear(); render(); }
+
+  // Opens the Create sheet. Resolves 'book', 'upload', or null if dismissed.
+  // Upload is a prototype dead end: it just closes the sheet.
+  function chooseIntent() {
+    const toggle = open => {
+      sheet.classList.toggle('sheet--active', open);
+      backdrop.classList.toggle('sheet-backdrop--active', open);
+    };
+    toggle(true);
+    return new Promise(resolve => {
+      const done = choice => {
+        sheet.removeEventListener('click', onSheet);
+        backdrop.removeEventListener('click', onBackdrop);
+        toggle(false);
+        resolve(choice);
+      };
+      const onSheet = e => { const b = e.target.closest('[data-choice]'); if (b) done(b.dataset.choice); };
+      const onBackdrop = () => done(null);
+      sheet.addEventListener('click', onSheet);
+      backdrop.addEventListener('click', onBackdrop);
+    });
+  }
 
   function set(list, on) {
     list.forEach(id => (on ? ids.add(id) : ids.delete(id)));
@@ -92,7 +152,7 @@ const Selection = (() => {
   return {
     get active() { return active; },
     has: id => ids.has(id),
-    start, cancel, set, confirmLeave, onChange
+    start, cancel, set, chooseIntent, confirmLeave, onChange
   };
 })();
 

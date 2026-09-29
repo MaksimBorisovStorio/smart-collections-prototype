@@ -4,6 +4,7 @@ const AppState = {
   chosenOrientation: null,
   chosenSize: null,
   chosenCover: null,
+  autofill: true,
 
   reset() {
     this.currentCollection = null;
@@ -11,6 +12,7 @@ const AppState = {
     this.chosenOrientation = null;
     this.chosenSize = null;
     this.chosenCover = null;
+    this.autofill = true;
   }
 };
 

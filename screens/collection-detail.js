@@ -20,13 +20,13 @@ Router.register('collection', {
       </div>`;
   },
 
-  // Grey placeholder standing in for a photo. Becomes tappable in select mode.
-  _tiles(count, di) {
-    let html = '';
-    for (let i = 0; i < count; i++) {
-      html += `<button class="cd-tile" data-id="${di}-${i}" data-day="${di}" aria-pressed="false"><span class="cd-tile__check"></span></button>`;
-    }
-    return html;
+  // One tile per photo; a day without `photos` gets `count` grey placeholders.
+  _tiles(day, di) {
+    const photos = day.photos || Array(day.count).fill('');
+    return photos.map((src, i) => `
+      <button class="cd-tile" data-id="${di}-${i}" data-day="${di}" aria-pressed="false">${
+        src ? `<img class="cd-tile__img" src="${src}" alt="" loading="lazy" decoding="async">` : ''
+      }<span class="cd-tile__check"></span></button>`).join('');
   },
 
   render(params) {
@@ -51,7 +51,7 @@ Router.register('collection', {
 
         <div class="cd__scroll">
           <div class="cd-grid">
-            ${days.map((d, di) => this._dayHeader(d, di) + this._tiles(d.count, di)).join('')}
+            ${days.map((d, di) => this._dayHeader(d, di) + this._tiles(d, di)).join('')}
           </div>
 
           <!-- What you can do with this album. The floating Create button lands
@@ -79,21 +79,6 @@ Router.register('collection', {
              takes its place in select mode. -->
         <button class="cd-fab" id="cd-create">Create</button>
 
-        <!-- Create options sheet -->
-        <div class="sheet-backdrop" id="cd-backdrop"></div>
-        <div class="sheet cd-sheet" id="cd-sheet" role="dialog" aria-label="Create">
-          <div class="sheet__handle"></div>
-          <div class="sheet__options">
-            <button class="sheet-option" id="cd-opt-book">
-              <span class="sheet-option__text"><span class="sheet-option__name">Create a photo book</span></span>
-              <span class="sheet-option__arrow">›</span>
-            </button>
-            <button class="sheet-option" id="cd-opt-upload">
-              <span class="sheet-option__text"><span class="sheet-option__name">Upload to my photos</span></span>
-              <span class="sheet-option__arrow">›</span>
-            </button>
-          </div>
-        </div>
       </div>
     `;
   },
@@ -107,11 +92,6 @@ Router.register('collection', {
     const idOf = t => `${cid}:${t.dataset.id}`;
     const ofDay = day => tiles.filter(t => t.dataset.day === day);
     const allOn = list => list.every(t => Selection.has(idOf(t)));
-
-    const openSheet = open => {
-      $('#cd-sheet').classList.toggle('sheet--active', open);
-      $('#cd-backdrop').classList.toggle('sheet-backdrop--active', open);
-    };
 
     // Mirror the shared selection: select mode, ticks, Select / Select all labels.
     const sync = () => {
@@ -159,16 +139,16 @@ Router.register('collection', {
     const setMany = (list, on) => Selection.set(list.map(idOf), on);
 
     $('#cd-back').addEventListener('click', () => Router.back());
-    $('#cd-create').addEventListener('click', () => openSheet(true));
-    $('#cd-backdrop').addEventListener('click', () => openSheet(false));
-    $('#cd-opt-upload').addEventListener('click', () => openSheet(false));
-    $('#cd-opt-book').addEventListener('click', () => {
-      openSheet(false);
-      Selection.start();
+    // Create first: pick "Create a photo book", then select.
+    $('#cd-create').addEventListener('click', () => {
+      Selection.chooseIntent().then(choice => { if (choice === 'book') Selection.start('book'); });
     });
 
+    // Photo first: tapping any photo starts select mode with it ticked;
+    // Continue then asks what the photos are for.
     tiles.forEach(t => t.addEventListener('click', () => {
-      if (Selection.active) setMany([t], !Selection.has(idOf(t)));
+      if (!Selection.active) Selection.start();
+      setMany([t], !Selection.has(idOf(t)));
     }));
 
     el.querySelectorAll('.cd-select').forEach(btn => btn.addEventListener('click', () => {
